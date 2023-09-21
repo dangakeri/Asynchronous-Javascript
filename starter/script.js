@@ -124,35 +124,42 @@ btn.addEventListener('click', function () {
 
 // Coding challenge
 
-/*
-const whereAmI = function (lat, lng) {
-  // fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`)
-  fetch(
-    `https://geocode.xyz/${lat},${lng}?geoit=json&auth=825691167061114611946x42418`
-  )
-    .then(res => {
-      if (!res.ok) throw new Error(`Problem with Geocoding ${res.status}`);
-      return res.json();
-    })
+// const whereAmI = function (lat, lng) {
+//   // fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`)
+//   fetch(
+//     `https://geocode.xyz/${lat},${lng}?geoit=json&auth=825691167061114611946x42418`
+//   )
+//     .then(res => {
+//       if (!res.ok) throw new Error(`Problem with Geocoding ${res.status}`);
+//       return res.json();
+//     })
 
-    .then(data => {
-      console.log(data);
-      console.log(`You are in ${data.city}, ${data.country}`);
+//     .then(data => {
+//       console.log(data);
+//       console.log(`You are in ${data.city}, ${data.country}`);
 
-      fetch(`https://restcountries.com/v3.1/name/${data.country}`);
-    })
-    .then(res => {
-      if (!res.ok) throw new Error(`Country not found (${res.status})`);
-      return res.json();
-    })
-    .then(data => renderCountry(data[0]))
-    .catch(err => console.log(`${err.message}`));
-};
+//       fetch(`https://restcountries.com/v3.1/name/${data.country}`)
+//         .then(res => {
+//           console.log(res);
+//           if (!res.ok) throw new Error(`Country not found (${res.status})`);
+//           return res.json();
+//         })
+//         .then(data => renderCountry(data[0]));
+//     })
 
-whereAmI(52.508, 13.381);
-whereAmI(19.037, 72.873);
-whereAmI(-33.933, 18.474);
-*/
+//     .catch(err => console.log(`${err.message}`));
+// };
+
+// whereAmI(52.508, 13.381);
+// whereAmI(19.037, 72.873);
+// whereAmI(-33.933, 18.474);
+
+// function getCountryName() {
+//   fetch('https://restcountries.com/v3.1/name/tanzania')
+//     .then(res => res.json())
+//     .then(data => console.log(data));
+// }
+// getCountryName();
 
 // console.log('Test start');
 // setTimeout(() => console.log('0 second timer'), 0);
@@ -162,7 +169,7 @@ whereAmI(-33.933, 18.474);
 //   console.log(res);
 // });
 // console.log('Test end');
-
+/*
 const lotteryPromise = new Promise(function (resolve, reject) {
   console.log('Lottery draw is happening now🔮');
   setTimeout(function () {
@@ -192,3 +199,46 @@ wait(2)
 
 Promise.resolve('abc').then(x => console.log(x));
 Promise.reject(new Error('Problem!')).catch(x => console.error(x));
+*/
+const getPosition = function () {
+  return new Promise(function (resolve, reject) {
+    // navigator.geolocation.getCurrentPosition(
+    //   position => {
+    //     resolve(position);
+    //   },
+    //   err => reject(err)
+    // );
+    navigator.geolocation.getCurrentPosition(resolve, reject);
+  });
+};
+
+// getPosition().then(position => console.log(position));
+const whereAmI = function (lat, lng) {
+  getPosition()
+    .then(position => {
+      const { latitude: lat, longitude: lng } = position.coords;
+      return fetch(
+        `https://geocode.xyz/${lat},${lng}?geoit=json&auth=825691167061114611946x42418`
+      );
+    })
+    .then(res => {
+      if (!res.ok) throw new Error(`Problem with Geocoding ${res.status}`);
+      return res.json();
+    })
+
+    .then(data => {
+      console.log(data);
+      console.log(`You are in ${data.city}, ${data.country}`);
+
+      fetch(`https://restcountries.com/v3.1/name/${data.country}`)
+        .then(res => {
+          console.log(res);
+          if (!res.ok) throw new Error(`Country not found (${res.status})`);
+          return res.json();
+        })
+        .then(data => renderCountry(data[0]));
+    })
+
+    .catch(err => console.log(`${err.message}`));
+};
+btn.addEventListener('click', whereAmI);
