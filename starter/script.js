@@ -242,3 +242,5 @@ const whereAmI = function (lat, lng) {
     .catch(err => console.log(`${err.message}`));
 };
 btn.addEventListener('click', whereAmI);
+
+// Coding challenge 2
