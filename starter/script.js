@@ -199,7 +199,7 @@ wait(2)
 
 Promise.resolve('abc').then(x => console.log(x));
 Promise.reject(new Error('Problem!')).catch(x => console.error(x));
-*/
+
 const getPosition = function () {
   return new Promise(function (resolve, reject) {
     // navigator.geolocation.getCurrentPosition(
@@ -243,4 +243,110 @@ const whereAmI = function (lat, lng) {
 };
 btn.addEventListener('click', whereAmI);
 
+const capitalizeWords = function (word) {
+  const words = word.split(' ');
+  const namesUpper = [];
+
+  for (const w of words) {
+    namesUpper.push(w[0].toUpperCase() + w.slice(1));
+  }
+  console.log(namesUpper.join(' '));
+};
+capitalizeWords('a lazy fox');
+
+const takeInitialCharacter = function (char) {
+  const characters = char.split(' ');
+  const charactersUpper = [];
+
+  for (const c of characters) {
+    charactersUpper.push(c[0].toUpperCase());
+  }
+  console.log(charactersUpper.join(''));
+};
+takeInitialCharacter('daniel gakeri');
+
 // Coding challenge 2
+
+const wait = function (seconds) {
+  return new Promise(function (resolve) {
+    setTimeout(resolve, seconds * 1000);
+  });
+};
+
+const imgContainer = document.querySelector('.images');
+
+const createImage = function (imgPath) {
+  return new Promise(function (resolve, reject) {
+    const img = document.createElement('img');
+    img.src = imgPath;
+
+    img.addEventListener('load', function () {
+      imgContainer.append(img);
+      resolve(img);
+    });
+    img.addEventListener('error', function () {
+      reject(new Error('Image not found'));
+    });
+  });
+};
+
+let currentImg;
+createImage('../starter/img/img-1.jpg')
+  .then(img => {
+    currentImg = img;
+    console.log('Image 1 loaded');
+    return wait(2);
+  })
+  .then(() => {
+    currentImg.style.display = 'none';
+    return createImage('../starter/img/img-2.jpg');
+  })
+  .then(img => {
+    currentImg = img;
+    console.log('Image 2 loaded');
+    return wait(2);
+  })
+  .then(() => {
+    currentImg.style.display = 'none';
+  })
+  .catch(err => console.log(err));
+  */
+
+const getPosition = function () {
+  return new Promise(function (resolve, reject) {
+    navigator.geolocation.getCurrentPosition(resolve, reject);
+  });
+};
+
+const whereAmI = async function () {
+  try {
+    // Geolocation
+    const pos = await getPosition();
+    const { latitude: lat, longitude: lng } = pos.coords;
+
+    // Reverse geocoding
+    const resGeo = await fetch(
+      `https://geocode.xyz/${lat},${lng}?geoit=json&auth=825691167061114611946x42418`
+    );
+    if (!resGeo.ok) throw new Error(`Problem getting country`);
+    const dataGeo = await resGeo.json();
+
+    // Country data
+    const res = await fetch(
+      `https://restcountries.com/v3.1/name/${dataGeo.country}`
+    );
+    if (!resGeo.ok) throw new Error(`Problem getting country`);
+    const data = await res.json();
+
+    renderCountry(data[0]);
+
+    return `You are in ${dataGeo.city}, ${dataGeo.country}`;
+  } catch (err) {
+    console.error(err);
+    renderError(`Something went wrong ${err.message}`);
+  }
+};
+
+console.log('1: Will get location');
+whereAmI();
+console.log('2: finished getting location');
